@@ -8,8 +8,8 @@ public class GraphSearch extends Search {
 	private static String filename = "CyclicGraph50.txt";
 	
 	// this monitor keeps track of all threads initiated, so that the main thread can tell when they are all done.
-	private ThreadMonitor threads = new ThreadMonitor();
-	private class ThreadMonitor{
+	private ThreadTracker threads = new ThreadTracker();
+	private class ThreadTracker{
 		private List<Thread> threads = new LinkedList<Thread>();
 		private int size = 0;
 		private long waitTime = 0; // if each task takes time, we might increase this to be certain index == size means we are done.
@@ -87,10 +87,6 @@ public class GraphSearch extends Search {
 
 		@Override
 		public void run() {
-			SearchRec();
-		}
-
-		public void SearchRec(){
 			// check if it has been visited
 			if(visited.contains(nodeId)){
 				node.AddCycle(pathToNode);
@@ -111,7 +107,6 @@ public class GraphSearch extends Search {
 				threads.Add(childThread);
 				childThread.start();
 			}
-
 		}
 	}
 

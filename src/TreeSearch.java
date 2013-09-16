@@ -7,8 +7,8 @@ public class TreeSearch extends Search {
 	private static String filename = "tree1.txt";
 	
 	// this monitor keeps track of all threads initiated, so that the main thread can tell when they are all done.
-	private ThreadMonitor threads = new ThreadMonitor();
-	private class ThreadMonitor{
+	private ThreadTracker threads = new ThreadTracker();
+	private class ThreadTracker{
 		private List<Thread> threads = new LinkedList<Thread>();
 		private int size = 0;
 		private long waitTime = 0; // if each task takes time, we might increase this to be certain index == size means we are done.
@@ -66,7 +66,7 @@ public class TreeSearch extends Search {
 		PrintResults();
 	}
 
-	public class TreeSearchThread extends Thread{
+	private class TreeSearchThread extends Thread{
 		Node node;
 		String pathToNode;
 		int nodeId;
@@ -79,11 +79,6 @@ public class TreeSearch extends Search {
 
 		@Override
 		public void run() {
-			SearchRec();
-		}
-
-		public void SearchRec(){
-
 			// base case
 			if(goals.contains(nodeId)){
 				node.AddAnswer(pathToNode);
@@ -98,7 +93,7 @@ public class TreeSearch extends Search {
 		}
 	}
 
-
+		
 	public static void main(String[] args){
 		new TreeSearch().Search();
 	}

@@ -14,8 +14,8 @@ public class GraphSearchThreadPool extends Search {
 
 	private ExecutorService pool;
 	
-	private TaskFutureMonitor futures = new TaskFutureMonitor();
-	private class TaskFutureMonitor{
+	private TaskTracker tasks = new TaskTracker();
+	private class TaskTracker{
 		private List<Future<?>> futures = new LinkedList<Future<?>>();
 		private int size = 0;
 		private long waitTime = 0;  // this would be higher if each task took longer to process
@@ -31,7 +31,7 @@ public class GraphSearchThreadPool extends Search {
 		/**
 		 * Blocks the calling thread until we are confident all tasks are complete.
 		 */
-		public void WaitForAllTasks(){		
+		public void Wait(){		
 			// go through the whole list waiting for each task as we go
 			int index = 0;
 			while (index < size){
@@ -72,10 +72,10 @@ public class GraphSearchThreadPool extends Search {
 		Runnable task = new GraphSearchTask("", nodes.get(this.start), new HashSet<Integer>());
 		
 		// start
-		futures.AddTask(pool.submit(task));
+		tasks.AddTask(pool.submit(task));
 		
 		// wait for all to finish
-		futures.WaitForAllTasks();
+		tasks.Wait();
 		
 		stopTime = System.currentTimeMillis();
 		pool.shutdown();
@@ -85,7 +85,8 @@ public class GraphSearchThreadPool extends Search {
 	}
 
 
-	public class GraphSearchTask implements Runnable{
+	private class GraphSearchTask implements Runnable{
+		
 		Node node;
 		String pathToNode;
 		int nodeId;
@@ -100,10 +101,6 @@ public class GraphSearchThreadPool extends Search {
 
 		@Override
 		public void run() {
-			SearchRec();
-		}
-
-		public void SearchRec(){
 			// check if it has been visited
 			if(visited.contains(nodeId)){
 				node.AddCycle(pathToNode);
@@ -120,9 +117,10 @@ public class GraphSearchThreadPool extends Search {
 
 			// make a new task for each child search
 			for(Node child: node.GetChildren()){
-				futures.AddTask(pool.submit(new GraphSearchTask(pathToNode, child, visited)));
-			}			
+				tasks.AddTask(pool.submit(new GraphSearchTask(pathToNode, child, visited)));
+			}	
 		}
+
 	}
 
 
