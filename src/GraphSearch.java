@@ -5,7 +5,7 @@ import java.util.Set;
 
 public class GraphSearch extends Search {
 
-	private static String filename = "CyclicGraph50.txt";
+	private static String filename = "CyclicGraph100-100.txt";
 	
 	// this monitor keeps track of all threads initiated, so that the main thread can tell when they are all done.
 	private ThreadTracker threads = new ThreadTracker();

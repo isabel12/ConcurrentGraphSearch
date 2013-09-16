@@ -108,7 +108,6 @@ public class FileReader {
 
 			// connect them
 			node1.AddChild(node2);
-			node2.AddChild(node1);
 		}
 
 		// print the graph to sysout
@@ -121,6 +120,6 @@ public class FileReader {
 
 
 	public static void main(String[] args){
-		FileReader.GenerateGraph(50, 50);
+		FileReader.GenerateGraph(100, 250);
 	}
 }

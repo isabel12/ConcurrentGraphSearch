@@ -28,6 +28,8 @@ public class Search {
 
 	protected long startTime;
 	protected long stopTime;
+	
+	private static boolean printCycles = false;
 
 	/**
 	 * Constructor :)
@@ -53,45 +55,47 @@ public class Search {
 		}
 
 		System.out.println("NumAnswers: " + answers.size());
-
-		// add in the cycles.
-		//--------------------------------------
-
-		// for each answer
-		for(int i = 0; i < answers.size(); i++){
-			String initialAnswer = answers.get(i);
-			Scanner scan = new Scanner(initialAnswer);
-
-			Set<String> containedCycles = new HashSet<String>(); // this is to help keep track of if it is already contained or not.
-			String actualAnswer = initialAnswer;
-
-			// for each nodeid in the answer
-			while(scan.hasNextInt()){
-				// get the cycles starting from that node
-				Node nextNode = nodes.get(scan.nextInt());
-				String cycleString = nextNode.GetCycles();
-				if(cycleString != ""){
-
-					// add the cycles in if they aren't already contained (this means if (4,6,3)* is already contained, we won't add (3,4,6)*)
-					if(!CycleUsed(cycleString, containedCycles)){
-
-						// insert it into the answer
-						int nodeIndex = actualAnswer.indexOf(nextNode.GetId() + " ");  // it will always be at most once with a space after it.
-						if(nodeIndex > -1){
-							String firstHalf = actualAnswer.substring(0, nodeIndex);
-							String secondHalf = actualAnswer.substring(nodeIndex + 2);
-							actualAnswer = firstHalf + nextNode.GetId() + " " + cycleString + " " + secondHalf;
+		
+		if(printCycles){
+			// add in the cycles.
+			//--------------------------------------
+	
+			// for each answer
+			for(int i = 0; i < answers.size(); i++){
+				String initialAnswer = answers.get(i);
+				Scanner scan = new Scanner(initialAnswer);
+	
+				Set<String> containedCycles = new HashSet<String>(); // this is to help keep track of if it is already contained or not.
+				String actualAnswer = initialAnswer;
+	
+				// for each nodeid in the answer
+				while(scan.hasNextInt()){
+					// get the cycles starting from that node
+					Node nextNode = nodes.get(scan.nextInt());
+					String cycleString = nextNode.GetCycles();
+					if(cycleString != ""){
+	
+						// add the cycles in if they aren't already contained (this means if (4,6,3)* is already contained, we won't add (3,4,6)*)
+						if(!CycleUsed(cycleString, containedCycles)){
+	
+							// insert it into the answer
+							int nodeIndex = actualAnswer.indexOf(nextNode.GetId() + " ");  // it will always be at most once with a space after it.
+							if(nodeIndex > -1){
+								String firstHalf = actualAnswer.substring(0, nodeIndex);
+								String secondHalf = actualAnswer.substring(nodeIndex + 2);
+								actualAnswer = firstHalf + nextNode.GetId() + " " + cycleString + " " + secondHalf;
+							}
+	
+							// record that we have used it
+							containedCycles.add(cycleString);
 						}
-
-						// record that we have used it
-						containedCycles.add(cycleString);
 					}
 				}
+	
+				// add in the new answer
+				answers.remove(i);
+				answers.add(i, actualAnswer);
 			}
-
-			// add in the new answer
-			answers.remove(i);
-			answers.add(i, actualAnswer);
 		}
 
 		// print complete answers
@@ -155,14 +159,29 @@ public class Search {
 	 */
 	public static void main(String[] args){
 
-		// first arg is type of search
-		String searchType = args.length > 0 ? args[0] : null;
-
-		// second arg is the filename
-		String filename = args.length > 1 ? args[1] : null;
+		String searchType = "graphFindOne";
+		String filename = null;
+		int numThreads = 0;
+		printCycles = false;
 		
-		// third arg is the number of threads to use. 
-		int numThreads = args.length > 2 ? Integer.parseInt(args[2]) : 0;
+		// extract arguments
+		for(String arg: args){
+			if(arg.startsWith("searchType=")){
+				searchType = arg.replaceAll("searchType=", "");
+			}
+			
+			else if(arg.startsWith("filename=")){
+				filename = arg.replaceAll("filename=", "");
+			}
+			
+			else if (arg.startsWith("numThreads=")){
+				numThreads = Integer.parseInt(arg.replaceAll("numThreads=", ""));
+			}
+			
+			else if (arg.startsWith("printCycles=")){
+				printCycles = Boolean.parseBoolean(arg.replace("printCycles=", ""));
+			}
+		}
 
 		if(searchType.equals("tree")){
 			System.out.println("Performing find all tree search");
