@@ -8,6 +8,9 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
+/**
+ * This class performs a concurrent graph search with a limited number of threads to find all paths between Start and Goal(s).
+ */
 public class GraphSearchThreadPool extends Search {
 
 	private static String filename = "CyclicGraph50.txt";

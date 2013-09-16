@@ -3,6 +3,9 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
+/**
+ * This class performs a concurrent graph search to find any path between Start and Goal(s).
+ */
 public class GraphSearchFindOne extends Search {
 
 	private static String filename = "CyclicGraph50.txt";
@@ -12,7 +15,8 @@ public class GraphSearchFindOne extends Search {
 	private class AnswerMonitor {
 		private boolean found;
 
-		public boolean Found() {
+		
+		public boolean Found() { // doesn't need to be synchronized as readonly
 			return found;
 		}
 
@@ -42,7 +46,7 @@ public class GraphSearchFindOne extends Search {
 		/**
 		 * Calling this method blocks the calling thread until we are certain all threads are complete.
 		 */
-		public void Wait(){
+		public void Wait(){  // doesn't need to be synchronized as readonly
 			int index = 0;
 			while (index < size){
 				Thread t = threads.get(index);

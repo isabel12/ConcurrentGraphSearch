@@ -1,7 +1,9 @@
 import java.util.LinkedList;
 import java.util.List;
 
-
+/**
+ * This class performs a concurrent tree search to find all paths between Start and Goal(s).
+ */
 public class TreeSearch extends Search {
 
 	private static String filename = "tree1.txt";
