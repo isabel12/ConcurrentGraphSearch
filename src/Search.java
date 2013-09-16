@@ -19,7 +19,6 @@ import java.util.Collections;
  *
  */
 public class Search {
-	static String directory = "";
 
 	protected Map<Integer, Node> nodes;
 	protected Set<Integer> goals;
@@ -36,7 +35,7 @@ public class Search {
 	 */
 	protected Search(String filename){
 		FileReader reader = new FileReader();
-		reader.ReadFile(directory + filename);
+		reader.ReadFile(filename);
 		this.nodes = reader.getNodes();
 		this.goals = reader.getGoals();
 		this.start = reader.getStart();
@@ -159,8 +158,11 @@ public class Search {
 		// first arg is type of search
 		String searchType = args.length > 0 ? args[0] : null;
 
-		// second arg is an optional filename
+		// second arg is the filename
 		String filename = args.length > 1 ? args[1] : null;
+		
+		// third arg is the number of threads to use. 
+		int numThreads = args.length > 2 ? Integer.parseInt(args[2]) : 0;
 
 		if(searchType.equals("tree")){
 			System.out.println("Performing find all tree search");
@@ -172,15 +174,24 @@ public class Search {
 		}
 
 		else if (searchType.equals("graph")){
-			System.out.println("Performing find all graph search");
-			if(filename != null){
-				new GraphSearch(filename).Search();
-			}else {
-				new GraphSearch().Search();
+			if(numThreads == 0){			
+				System.out.println("Performing find all graph search with unlimited threads");
+				if(filename != null){
+					new GraphSearch(filename).Search();
+				}else {
+					new GraphSearch().Search();
+				}
+			} else {
+				System.out.println("Performing find all graph search with " + " threads.");
+				if(filename != null){
+					new GraphSearchThreadPool(filename, numThreads).Search();
+				}else {
+					new GraphSearchThreadPool(numThreads).Search();
+				}
 			}
 		}
 
-		else {
+		else if (searchType.equals("graphFindOne")) {
 			System.out.println("Performing find one graph search");
 			if(filename != null){
 				new GraphSearchFindOne(filename).Search();

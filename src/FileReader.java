@@ -120,43 +120,6 @@ public class FileReader {
 	}
 
 
-	public static void GenerateTree(int numNodes, int numEdges){
-
-		HashMap<Integer, Node> nodes = new HashMap<Integer, Node>();
-
-		// create the nodes
-		for(int i = 1; i <= numNodes; i++){
-			nodes.put(i, new Node(i));
-		}
-
-		// add in random connections
-		Random r = new Random();
-		for(int i = 1; i <= numEdges; i++){
-
-			// get two random nodes
-			int id1;
-			int id2;
-			do{
-				id1 = r.nextInt(numNodes) + 1;
-				id2 = r.nextInt(numNodes) + 1;
-			} while (id1 == id2);
-			Node node1 = nodes.get(id1);
-			Node node2 = nodes.get(id2);
-
-			// connect them
-			node1.AddChild(node2);
-			node2.AddChild(node1);
-		}
-
-		// print the graph to sysout
-		for(Node n: nodes.values()){
-			for(Node c: n.GetChildren()){
-				System.out.println(n.GetId() + " " + c.GetId());
-			}
-		}
-	}
-
-
 	public static void main(String[] args){
 		FileReader.GenerateGraph(50, 50);
 	}

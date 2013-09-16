@@ -1,10 +1,48 @@
 import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Set;
 
 public class GraphSearch extends Search {
 
-	private static String filename = "CyclicGraph1.txt";
-
+	private static String filename = "CyclicGraph50.txt";
+	
+	// this monitor keeps track of all threads initiated, so that the main thread can tell when they are all done.
+	private ThreadMonitor threads = new ThreadMonitor();
+	private class ThreadMonitor{
+		private List<Thread> threads = new LinkedList<Thread>();
+		private int size = 0;
+		private long waitTime = 0; // if each task takes time, we might increase this to be certain index == size means we are done.
+		
+		/**
+		 * Adds one thread to the list safely.
+		 */
+		public synchronized void Add(Thread thread){
+			threads.add(thread);
+			size++;
+		}
+		
+		/**
+		 * Calling this method blocks the calling thread until we are certain all threads are complete.
+		 */
+		public void Wait(){
+			int index = 0;
+			while (index < size){
+				Thread t = threads.get(index);
+				try {
+					t.join();
+					index++;
+					if(index == size){
+						Thread.sleep(waitTime); // if we have caught up, give size a chance to increase
+					}
+				} catch (InterruptedException e) {
+					e.printStackTrace();
+				} 
+			}
+		}
+	}
+	
+	
 	public GraphSearch() {
 		super(filename);
 	}
@@ -17,16 +55,19 @@ public class GraphSearch extends Search {
 		startTime = System.currentTimeMillis();
 		// create a new thread
 		Thread thread = new GraphSearchThread("", nodes.get(this.start), new HashSet<Integer>());
+		
 		// start
 		thread.start();
-		// wait to finish
-		try {
-			thread.join();
-		} catch (InterruptedException e) {
-			e.printStackTrace();
-		}
+		
+		// add it to the list of threads
+		threads.Add(thread);
+
+		// wait for all to finish
+		threads.Wait();
+		
 		stopTime = System.currentTimeMillis();
 
+		// print results
 		PrintResults();
 	}
 
@@ -65,23 +106,12 @@ public class GraphSearch extends Search {
 			}
 
 			// spawn a new thread for each child search
-			Set<Thread> childThreads = new HashSet<Thread>();
 			for(Node child: node.GetChildren()){
 				Thread childThread = new GraphSearchThread(pathToNode, child, visited);
-				childThreads.add(childThread);
+				threads.Add(childThread);
 				childThread.start();
 			}
 
-			// wait for all children to finish - this is so that we know when the results are ready, because it ensures that while the first thread is alive, the search is still in progress.
-			try {
-				for(Thread childThread: childThreads){
-					if(childThread.isAlive()){
-						childThread.join();
-					}
-				}
-			} catch (InterruptedException e) {
-				e.printStackTrace();
-			}
 		}
 	}
 
