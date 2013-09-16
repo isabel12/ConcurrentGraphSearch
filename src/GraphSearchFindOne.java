@@ -5,43 +5,47 @@ import java.util.Set;
 public class GraphSearchFindOne extends Search {
 
 	private static String filename = "CyclicGraph2.txt";
-	
+
 	// a monitor to stop multiple answers being added.
-	private AnswerMonitor answerMonitor = new AnswerMonitor();			
+	private AnswerMonitor answerMonitor = new AnswerMonitor();
 	private class AnswerMonitor{
 		private boolean found;
-		
+
 		public boolean Found(){
 			return found;
 		}
-		
+
 		public synchronized void RecordAnswer(Node n, String pathToNode){
 			if(!found){
 				n.AddAnswer(pathToNode);
-				this.found = true;	
+				this.found = true;
 			}
 		}
 	}
-	
+
 	public GraphSearchFindOne() {
+		super(filename);
+	}
+
+	public GraphSearchFindOne(String filename) {
 		super(filename);
 	}
 
 	/**
 	 * Initialises a search from the start node, and prints results.
 	 */
-	public void Search(){	
-		startTime = System.currentTimeMillis();	
+	public void Search(){
+		startTime = System.currentTimeMillis();
 		// create a new thread
-		Thread thread = new SearchThread("", nodes.get(this.start), new HashSet<Integer>());	
+		Thread thread = new SearchThread("", nodes.get(this.start), new HashSet<Integer>());
 		// start
-		thread.start();		
+		thread.start();
 		// wait to finish
 		try {
 			thread.join();
 		} catch (InterruptedException e) {
 			e.printStackTrace();
-		}		
+		}
 		stopTime = System.currentTimeMillis();
 
 		PrintResults();
@@ -59,7 +63,7 @@ public class GraphSearchFindOne extends Search {
 			this.node = n;
 			this.visited = new HashSet<Integer>(visited);
 		}
-		
+
 		@Override
 		public void run() {
 			SearchRec();
@@ -70,7 +74,7 @@ public class GraphSearchFindOne extends Search {
 			if(answerMonitor.Found()){
 				return;
 			}
-			
+
 			// check for a cycle
 			if(visited.contains(nodeId)){
 				node.AddCycle(pathToNode);
@@ -81,7 +85,7 @@ public class GraphSearchFindOne extends Search {
 			visited.add(nodeId);
 
 			// see if we are at a goal
-			if(goals.contains(nodeId)){	
+			if(goals.contains(nodeId)){
 				answerMonitor.RecordAnswer(node, pathToNode);
 				return;
 			}
@@ -92,7 +96,7 @@ public class GraphSearchFindOne extends Search {
 				Thread childThread = new SearchThread(pathToNode, child, visited);
 				childThreads.add(childThread);
 				childThread.start();
-			}	
+			}
 
 			// wait for all children to finish
 			try {
@@ -106,7 +110,7 @@ public class GraphSearchFindOne extends Search {
 			}
 		}
 	}
-	
+
 	public static void main(String[] args){
 		new GraphSearchFindOne().Search();
 	}

@@ -8,16 +8,18 @@ import java.util.Set;
 import java.util.Collections;
 
 /**
- * This class is the base class for all the different search classes.  It holds the nodes, start, goals, 
- * and is responsible for interpreting and formatting the results from the nodes after the sub-class has performed the 
+ * This class is the base class for all the different search classes.  It holds the nodes, start, goals,
+ * and is responsible for interpreting and formatting the results from the nodes after the sub-class has performed the
  * search, and printing out the results.
- * 
+ *
  * The search will be initialised from the sub-class.
+ *
+ * However, the main method for the project is contained in this class.
  * @author Izzi
  *
  */
 public class Search {
-	static String directory = "C:\\Users\\Izzi\\Documents\\Uni\\NWEN303\\Project1\\";
+	static String directory = "";
 
 	protected Map<Integer, Node> nodes;
 	protected Set<Integer> goals;
@@ -27,7 +29,7 @@ public class Search {
 
 	protected long startTime;
 	protected long stopTime;
-	
+
 	/**
 	 * Constructor :)
 	 * @param filename
@@ -37,12 +39,12 @@ public class Search {
 		reader.ReadFile(directory + filename);
 		this.nodes = reader.getNodes();
 		this.goals = reader.getGoals();
-		this.start = reader.getStart();	
+		this.start = reader.getStart();
 	}
-	
+
 	protected void PrintResults(){
 		System.out.println(String.format("Time taken: %dms", (int)(stopTime-startTime)));
-		
+
 		// get all answers
 		List<String> answers = new ArrayList<String>();
 		for(Node n: nodes.values()){
@@ -52,18 +54,18 @@ public class Search {
 		}
 
 		System.out.println("NumAnswers: " + answers.size());
-		
-		// add in the cycles.  
+
+		// add in the cycles.
 		//--------------------------------------
-		
+
 		// for each answer
 		for(int i = 0; i < answers.size(); i++){
-			String initialAnswer = answers.get(i);		
+			String initialAnswer = answers.get(i);
 			Scanner scan = new Scanner(initialAnswer);
 
 			Set<String> containedCycles = new HashSet<String>(); // this is to help keep track of if it is already contained or not.
 			String actualAnswer = initialAnswer;
-			
+
 			// for each nodeid in the answer
 			while(scan.hasNextInt()){
 				// get the cycles starting from that node
@@ -79,18 +81,18 @@ public class Search {
 						if(nodeIndex > -1){
 							String firstHalf = actualAnswer.substring(0, nodeIndex);
 							String secondHalf = actualAnswer.substring(nodeIndex + 2);
-							actualAnswer = firstHalf + nextNode.GetId() + " " + cycleString + " " + secondHalf;			
+							actualAnswer = firstHalf + nextNode.GetId() + " " + cycleString + " " + secondHalf;
 						}
 
 						// record that we have used it
-						containedCycles.add(cycleString);	
+						containedCycles.add(cycleString);
 					}
 				}
 			}
 
 			// add in the new answer
 			answers.remove(i);
-			answers.add(i, actualAnswer);	
+			answers.add(i, actualAnswer);
 		}
 
 		// print complete answers
@@ -103,13 +105,13 @@ public class Search {
 
 	/**
 	 * This checks to see that there are no permutations of 'cycle1' contained in the 'containedCycles' set.
-	 * 
+	 *
 	 * Eg.  This method would count all the following as equal:
-	 * 
+	 *
 	 * 		(4,6,3)*, (6,3,4)*, (4,3,6)*
-	 * 
+	 *
 	 * Currently it just checks that the set is equal, rather than also checking the order.  So this won't work for graphs with symmetric cycles.
-	 * 
+	 *
 	 * @param cycle1
 	 * @param containedCycles
 	 * @return
@@ -148,4 +150,44 @@ public class Search {
 		return false;
 	}
 
+	/**
+	 * Entry point into the project
+	 * @param args
+	 */
+	public static void main(String[] args){
+
+		// first arg is type of search
+		String searchType = args.length > 0 ? args[0] : null;
+
+		// second arg is an optional filename
+		String filename = args.length > 1 ? args[1] : null;
+
+		if(searchType.equals("tree")){
+			System.out.println("Performing find all tree search");
+			if(filename != null){
+				new TreeSearch(filename).Search();
+			}else {
+				new TreeSearch().Search();
+			}
+		}
+
+		else if (searchType.equals("graph")){
+			System.out.println("Performing find all graph search");
+			if(filename != null){
+				new GraphSearch(filename).Search();
+			}else {
+				new GraphSearch().Search();
+			}
+		}
+
+		else {
+			System.out.println("Performing find one graph search");
+			if(filename != null){
+				new GraphSearchFindOne(filename).Search();
+			}else {
+				new GraphSearchFindOne().Search();
+			}
+		}
+
+	}
 }

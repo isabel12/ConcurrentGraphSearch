@@ -9,18 +9,22 @@ public class GraphSearch extends Search {
 		super(filename);
 	}
 
-	public void Search(){	
-		startTime = System.currentTimeMillis();	
+	public GraphSearch(String filename) {
+		super(filename);
+	}
+
+	public void Search(){
+		startTime = System.currentTimeMillis();
 		// create a new thread
-		Thread thread = new GraphSearchThread("", nodes.get(this.start), new HashSet<Integer>());	
+		Thread thread = new GraphSearchThread("", nodes.get(this.start), new HashSet<Integer>());
 		// start
-		thread.start();		
+		thread.start();
 		// wait to finish
 		try {
 			thread.join();
 		} catch (InterruptedException e) {
 			e.printStackTrace();
-		}		
+		}
 		stopTime = System.currentTimeMillis();
 
 		PrintResults();
@@ -39,13 +43,13 @@ public class GraphSearch extends Search {
 			this.node = n;
 			this.visited = new HashSet<Integer>(visited);
 		}
-		
+
 		@Override
 		public void run() {
 			SearchRec();
 		}
 
-		public void SearchRec(){	
+		public void SearchRec(){
 			// check if it has been visited
 			if(visited.contains(nodeId)){
 				node.AddCycle(pathToNode);
@@ -66,7 +70,7 @@ public class GraphSearch extends Search {
 				Thread childThread = new GraphSearchThread(pathToNode, child, visited);
 				childThreads.add(childThread);
 				childThread.start();
-			}	
+			}
 
 			// wait for all children to finish - this is so that we know when the results are ready, because it ensures that while the first thread is alive, the search is still in progress.
 			try {
@@ -80,8 +84,8 @@ public class GraphSearch extends Search {
 			}
 		}
 	}
-	
-	
+
+
 	public static void main(String[] args){
 		new GraphSearch().Search();
 	}

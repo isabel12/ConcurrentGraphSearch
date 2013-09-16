@@ -3,24 +3,28 @@ import java.util.Set;
 
 public class TreeSearch extends Search {
 
-	private static String filename = "Tree1.txt";
+	private static String filename = "tree1.txt";
 
 	public TreeSearch() {
 		super(filename);
 	}
 
-	public void Search(){	
-		startTime = System.currentTimeMillis();	
+	public TreeSearch(String filename){
+		super(filename);
+	}
+
+	public void Search(){
+		startTime = System.currentTimeMillis();
 		// create a new thread
-		Thread thread = new TreeSearchThread("", nodes.get(this.start));	
+		Thread thread = new TreeSearchThread("", nodes.get(this.start));
 		// start
-		thread.start();		
+		thread.start();
 		// wait to finish
 		try {
 			thread.join();
 		} catch (InterruptedException e) {
 			e.printStackTrace();
-		}		
+		}
 		stopTime = System.currentTimeMillis();
 
 		PrintResults();
@@ -36,13 +40,13 @@ public class TreeSearch extends Search {
 			this.pathToNode = pathToParent + nodeId + " ";  // adds itself to the path to the parent.
 			this.node = n;
 		}
-		
+
 		@Override
 		public void run() {
 			SearchRec();
 		}
 
-		public void SearchRec(){	
+		public void SearchRec(){
 
 			// base case
 			if(goals.contains(nodeId)){
@@ -55,7 +59,7 @@ public class TreeSearch extends Search {
 				Thread childThread = new TreeSearchThread(pathToNode, child);
 				childThreads.add(childThread);
 				childThread.start();
-			}	
+			}
 
 			// wait for all children to finish - this is so that we know when the results are ready, because it ensures that while the first thread is alive, the search is still in progress.
 			try {
@@ -69,10 +73,12 @@ public class TreeSearch extends Search {
 			}
 		}
 	}
-	
-	
+
+
 	public static void main(String[] args){
+
 		new TreeSearch().Search();
+
 	}
 
 }
